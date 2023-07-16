@@ -1,6 +1,6 @@
 # 앱개발 종합반
 
-## Instal Flutter
+## Install Flutter
 ```shell
 flutter doctor
 ```
