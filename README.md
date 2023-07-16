@@ -255,4 +255,107 @@ void main() {
 }
 ```
 
+- SharedPreference에는 String, List<String>, double, int, bool 타입만 저장할 수 있음.
+- 따라서 memoList를 String으로 변환 후 SharedPreference에 저장해야 함.
+- `saveMemoList()`
+  - List<Memo> -> (toJson) -> List<Map> -> (jsonEncode) -> String
+- `loadMemoList()`
+  - String -> (jsonDecode) -> List<Map> -> (fromJson) -> List<Memo>
+
+`toJson`과 `fromJson`:
+```dart
+class Memo {
+  Memo({
+    required this.content,
+  });
+
+  String content;
+
+  Map toJson() {
+    return {'content': content,};
+  }
+
+  factory Memo.fromJson(json) {
+    return Memo(content: json['content']);
+  }
+}
+```
+
+`saveMemoList()`과 `loadMemoList()`:
+```dart
+class MemoService extends ChangeNotifier {
+  MemoService() {
+    loadMemoList(); // loadMemoList()
+  }
+
+  List<Memo> memoList = [
+    Memo(content: '메모 예시'),
+  ];
+
+  createMemo({required String content}) {
+    Memo memo = Memo(content: content, updatedAt: DateTime.now());
+    memoList.add(memo);
+    notifyListeners();
+    saveMemoList(); // saveMemoList()
+  }
+
+  updateMemo({required int index, required String content}) {
+    Memo memo = memoList[index];
+    memo.content = content;
+    notifyListeners();
+    saveMemoList(); // saveMemoList()
+  }
+
+  deleteMemo({required int index}) {
+    memoList.removeAt(index);
+    notifyListeners();
+    saveMemoList(); // saveMemoList()
+  }
+
+  saveMemoList() {
+    List memoJsonList = memoList.map((memo) => memo.toJson()).toList();
+    String jsonString = jsonEncode(memoJsonList);
+    prefs.setString('memoList', jsonString);
+  }
+
+  loadMemoList() {
+    String? jsonString = prefs.getString('memoList');
+    if (jsonString == null) return;
+    List memoJsonList = jsonDecode(jsonString);
+    memoList = memoJsonList.map((json) => Memo.fromJson(json)).toList();
+  }
+}
+```
 ## async
+- 함수명 뒤에 `async`를 붙여줘서 asyncronous하게 (utilizing parallelism) 동작하도록 만들어 줌.
+- 기본적으로 비동기로 동작하는 함수를 동기로 실행하기 위해 `await`을 붙이는데, `await`을 쓰기 위해선 `async`를 붙여줘야 함.
+
+비동기로 동작:
+```dart
+void main() {
+  print("1");
+  Future.delayed(Duration(seconds: 1). () { // Future.delayed는 기본적으로 비동기로 동작하는 함수
+    print("2");
+  });
+  print("3")
+```
+```shell
+1
+3
+2
+```
+
+동기로 동작:
+```dart
+void main() async { // await 키워드를 쓰기 위해 async를 이용해 main함수를 비동기로 만들어 줌
+  print("1");
+  await Future.delayed(Duration(seconds: 1). () { // await을 붙여줘서 동기로 실행
+    print("2");
+  });
+  print("3")
+```
+```shell
+1
+2
+3
+```
