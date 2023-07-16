@@ -237,6 +237,9 @@ class MemoService extends ChangeNotifier {
 ```
 
 ## SharedPreferences
+- 데이터는 램에 저장됨.
+- 앱을 재시작해도 데이터를 유지하도록 다른 곳에 저장하기 위해 SharedPreferences를 사용함.
+
 SharedPreferences 적용 전:
 ```dart
 void main() {
@@ -255,8 +258,8 @@ void main() {
 }
 ```
 
-- SharedPreference에는 String, List<String>, double, int, bool 타입만 저장할 수 있음.
-- 따라서 memoList를 String으로 변환 후 SharedPreference에 저장해야 함.
+- SharedPreferences에는 String, List<String>, double, int, bool 타입만 저장할 수 있음.
+- 따라서 memoList를 String으로 변환 후 SharedPreferences에 저장해야 함.
 - `saveMemoList()`
   - List<Memo> -> (toJson) -> List<Map> -> (jsonEncode) -> String
 - `loadMemoList()`
